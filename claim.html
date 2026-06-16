@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claim Your License — CaptionCraft</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .claim-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    .claim-logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.4rem;
+    }
+    .claim-card {
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      padding: 2.5rem 2.8rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+      text-align: left;
+    }
+    .claim-card h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.4rem 0;
+      text-align: center;
+    }
+    .claim-card .sub {
+      color: var(--txt2);
+      font-size: 0.88rem;
+      margin: 0 0 1.8rem 0;
+      text-align: center;
+      line-height: 1.55;
+    }
+    .claim-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--txt2);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+    .claim-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--txt);
+      font-size: 0.95rem;
+      padding: 0.65rem 0.9rem;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 1.2rem;
+    }
+    .claim-input:focus { border-color: var(--accent); }
+    .claim-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+      letter-spacing: .03em;
+    }
+    .claim-btn:hover:not(:disabled) { background: #9b8df9; }
+    .claim-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .claim-status {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+      text-align: center;
+    }
+    .claim-status.error   { color: #f07070; }
+    .claim-status.info    { color: var(--accent); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .claim-status.loading { color: var(--accent); animation: pulse 1.2s infinite; }
+
+    /* No transaction state */
+    .no-txn { display: none; text-align: center; }
+    .no-txn.visible { display: block; }
+    .no-txn-icon { font-size: 2.4rem; margin-bottom: 0.6rem; }
+
+    /* Success state */
+    .claim-success { display: none; text-align: center; }
+    .claim-success.visible { display: block; }
+    .success-icon { font-size: 2.6rem; margin-bottom: 0.6rem; }
+    .success-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+    .success-sub {
+      font-size: 0.86rem;
+      color: var(--txt2);
+      margin-bottom: 1.4rem;
+      line-height: 1.55;
+    }
+    .key-box {
+      background: var(--bg);
+      border: 1px solid rgba(124,106,247,.35);
+      border-radius: 9px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    .key-label {
+      font-size: 0.7rem;
+      color: var(--txt3);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .key-value {
+      font-family: monospace;
+      font-size: 1rem;
+      color: var(--accent);
+      letter-spacing: .06em;
+      word-break: break-all;
+      cursor: pointer;
+      user-select: all;
+    }
+    .key-copy-hint {
+      font-size: 0.72rem;
+      color: var(--txt3);
+      margin-top: 0.3rem;
+    }
+    .dl-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 7px;
+      text-decoration: none;
+      transition: background 0.15s;
+      margin-bottom: 0.8rem;
+    }
+    .dl-btn:hover { background: #9b8df9; text-decoration: none; }
+    .claim-note {
+      font-size: 0.76rem;
+      color: var(--txt3);
+      text-align: center;
+      margin-top: 1.2rem;
+      line-height: 1.55;
+    }
+    .claim-note a { color: var(--txt3); }
+    .claim-note a:hover { color: var(--txt2); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">Caption<span class="accent">Craft</span></a>
+    <a class="btn-nav" href="https://square.link/u/BKrwvHYz">Buy — $49.99</a>
+  </div>
+</nav>
+
+<div class="claim-wrap">
+
+  <div class="claim-logo">Caption<span class="accent">Craft</span></div>
+
+  <div class="claim-card">
+
+    <!-- No transaction ID found -->
+    <div class="no-txn" id="noTxn">
+      <div class="no-txn-icon">⚠️</div>
+      <p style="font-size:1rem;font-weight:800;color:#fff;margin:0 0 0.5rem 0">No purchase detected</p>
+      <p style="font-size:0.87rem;color:var(--txt2);line-height:1.55;margin:0 0 1rem 0">
+        This page should be reached from your Square receipt link. If you purchased and didn't get an email, contact support below.
+      </p>
+      <p style="font-size:0.85rem;color:var(--txt2)">
+        Email <a href="mailto:support@infinityhub.dev" style="color:var(--accent)">support@infinityhub.dev</a> with your Square receipt and we'll sort it out right away.
+      </p>
+    </div>
+
+    <!-- Claim form -->
+    <div id="claimForm">
+      <h1>🎉 Purchase Complete!</h1>
+      <p class="sub">Enter the email you used at checkout and we'll send your license key — it also appears below instantly.</p>
+
+      <label class="claim-label" for="emailInput">Email address</label>
+      <input
+        id="emailInput"
+        class="claim-input"
+        type="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+      />
+
+      <button class="claim-btn" id="claimBtn" onclick="claimKey()">
+        Get My License Key
+      </button>
+
+      <div class="claim-status" id="claimStatus"></div>
+
+      <p class="claim-note">
+        Your key activates up to 3 devices and never expires.<br>
+        <a href="/">← Back to CaptionCraft</a>
+      </p>
+    </div>
+
+    <!-- Success state -->
+    <div class="claim-success" id="claimSuccess">
+      <div class="success-icon">✅</div>
+      <div class="success-title">You're licensed!</div>
+      <p class="success-sub">Your key is shown below and a copy is heading to your inbox. Keep it somewhere safe.</p>
+
+      <div class="key-box">
+        <div class="key-label">Your License Key</div>
+        <div class="key-value" id="keyDisplay" title="Click to copy" onclick="copyKey()"></div>
+        <div class="key-copy-hint" id="copyHint">Click key to copy</div>
+      </div>
+
+      <a class="dl-btn" href="https://github.com/contactinfinitysolutionsllc-ops/CaptionCraft/releases/latest/download/CaptionCraft-Setup-1.0.0.exe">
+        ⬇ Download CaptionCraft
+      </a>
+
+      <p style="font-size:0.82rem;color:var(--txt2);line-height:1.55;margin-top:0.8rem">
+        Open CaptionCraft → <strong>License</strong> tab → paste your key → <strong>Activate</strong>.
+      </p>
+
+      <p class="claim-note" style="margin-top:1rem">
+        Questions? <a href="mailto:support@infinityhub.dev">support@infinityhub.dev</a><br>
+        <a href="/">← Back to CaptionCraft</a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const WORKER = 'https://justdocs-worker.robertjosephreynolds.workers.dev';
+  const params = new URLSearchParams(window.location.search);
+  const txnId  = params.get('transactionId') || params.get('checkoutId') || params.get('transaction_id');
+
+  if (!txnId) {
+    document.getElementById('claimForm').style.display = 'none';
+    document.getElementById('noTxn').classList.add('visible');
+  }
+
+  async function claimKey() {
+    const email  = document.getElementById('emailInput').value.trim();
+    const btn    = document.getElementById('claimBtn');
+    const status = document.getElementById('claimStatus');
+
+    if (!email || !email.includes('@')) {
+      status.className = 'claim-status error';
+      status.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Verifying purchase…';
+    status.className = 'claim-status loading';
+    status.textContent = 'Checking your payment with Square…';
+
+    try {
+      const res = await fetch(WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'User-Agent': 'CaptionCraft/1.0' },
+        body: JSON.stringify({ action: 'claimCCLicense', transaction_id: txnId, email })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById('claimForm').style.display = 'none';
+        document.getElementById('keyDisplay').textContent = data.key;
+        document.getElementById('claimSuccess').classList.add('visible');
+        if (data.resent) {
+          document.querySelector('.success-sub').textContent =
+            'Key resent to your email — check your inbox (and spam folder).';
+        }
+      } else {
+        status.className = 'claim-status error';
+        status.textContent = data.error || 'Something went wrong. Please try again.';
+        btn.disabled = false;
+        btn.textContent = 'Get My License Key';
+      }
+    } catch (err) {
+      status.className = 'claim-status error';
+      status.textContent = 'Network error — check your connection and try again.';
+      btn.disabled = false;
+      btn.textContent = 'Get My License Key';
+    }
+  }
+
+  function copyKey() {
+    const key = document.getElementById('keyDisplay').textContent;
+    navigator.clipboard.writeText(key).then(() => {
+      document.getElementById('copyHint').textContent = '✓ Copied!';
+      setTimeout(() => {
+        document.getElementById('copyHint').textContent = 'Click key to copy';
+      }, 2000);
+    });
+  }
+
+  document.getElementById('emailInput')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') claimKey();
+  });
+</script>
+
+</body>
+</html>
